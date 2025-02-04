@@ -10,6 +10,7 @@
 
 
 ### Team Information
+- Elizabeth Smith
 
 
 ## Using DCO to sign your commits
