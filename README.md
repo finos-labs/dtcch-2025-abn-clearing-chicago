@@ -3,7 +3,7 @@
 # FINOS DTCC Hackathon 
 
 
-## Project Name
+## Project Name: Generative AI Processing of Corporate Actions
 
 
 ### Project Details
@@ -13,6 +13,29 @@
 - Joseph Uzubell
 - Zack Pan
 - Elizabeth Smith
+
+### User Setup Guide
+Required Software:
+- AWS credentials saved to environment variables: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SESSION_TOKEN.
+- Python >= 3.11.5
+```
+# Create python virtual environment
+python3 -m venv testing-env
+
+# Activate python virtual environment on UNIX or Mac OS
+source testing-env/bin/activate
+
+# Install required dependencies in the testing-env (activate first)
+pip install -r requirements.txt
+
+# Add your AWS credentials to your environment variables
+export <YOUR_AWS_ACCESS_KEY_ID>
+export <YOUR_AWS_SECRET_ACCESS_KEY>
+export <YOUR_AWS_SESSION_TOKEN>
+
+# Run AI solution that parses a Corporate Actions PDF and returns structured data output
+python3 src/parse_corporate_action.py
+```
 
 
 ## Using DCO to sign your commits
