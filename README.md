@@ -7,6 +7,9 @@
 
 
 ### Project Details
+Proof of Concept Code:
+- Solution 1 (parse_corporate_action.py): Proof of concept code that demonstrates the processing of corporate actions from pdf form.
+- Solution 2 (websummarization.py): Uses Generative AI to summarize a web page.
 
 
 ### Team Information
