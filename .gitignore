@@ -12,9 +12,11 @@
 dist
 site
 html
+dtcc
 
 # Virtual environments
 venv
+testing-env
 
 # Miscellaneous
 .idea
@@ -28,3 +30,6 @@ __pycache__
 
 # MSFT Office
 ~$*.*
+
+# Generated file output to ignore 
+dtcc-corpaction.png
