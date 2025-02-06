@@ -3,7 +3,7 @@
 # FINOS DTCC Hackathon 
 
 
-## Project Name
+## Project Name: Generative AI Processing of Corporate Actions
 
 
 ### Project Details
