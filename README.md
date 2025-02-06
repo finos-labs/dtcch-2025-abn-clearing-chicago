@@ -10,6 +10,8 @@
 
 
 ### Team Information
+- Joseph Uzubell
+- Zack Pan
 - Elizabeth Smith
 
 
