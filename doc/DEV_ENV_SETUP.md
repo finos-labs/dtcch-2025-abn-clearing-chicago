@@ -1,4 +1,4 @@
-# Note and Instructions for Developers of this Project
+# Notes and Instructions for Developers of this Project
 
 ## Python virtual environment maintenance commands
 ```
@@ -25,4 +25,17 @@ pip list
 ```
 # Save the current versions of all packages in the current environment
 pip freeze > requirements.txt
+```
+## AWS credential setup
+```
+# Add your AWS credentials to your environment variables
+export <YOUR_AWS_ACCESS_KEY_ID>
+export <YOUR_AWS_SECRET_ACCESS_KEY>
+export <YOUR_AWS_SESSION_TOKEN>
+```
+
+## Python Scripts for this project
+```
+# Run AI solution that parses a Corporate Actions PDF and returns structured data output
+python3 src/parse_corporate_action.py
 ```
