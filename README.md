@@ -42,6 +42,10 @@ export <YOUR_AWS_SESSION_TOKEN>
 # Run AI solution that parses a Corporate Actions PDF and returns structured data output
 python3 src/parse_corporate_action.py
 ```
+```
+# Run AI solution that summarize a html page
+python3 src/websummarization.py
+```
 
 
 ## Using DCO to sign your commits
