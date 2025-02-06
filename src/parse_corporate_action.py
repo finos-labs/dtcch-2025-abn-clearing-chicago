@@ -9,6 +9,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.prompts import PromptTemplate
 from langchain import hub
 from langchain_aws import ChatBedrock
+from typing import Optional
+from pydantic import BaseModel, Field
 import boto3
 import os
 
@@ -68,8 +70,29 @@ llm = ChatBedrock(
     model_kwargs=dict(temperature=0)
 )
 
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
+class Position:
+    account: str
+    security: str
+    shares: int
+    price: float
+    def __init__(self, account, security, shares, price):
+        self.account = account
+        self.security = security
+        self.shares = shares
+        self.price = price
+    def __str__(self):
+        return f"Account={self.account} Security={self.security} Shares={self.shares} Price={self.price}"
+    def __repr__(self):
+        return f"Account={self.account} Security={self.security} Shares={self.shares} Price={self.price}"
+
+class CorpAction(BaseModel):
+    security: str = Field(description="full company name")
+    original_shares: int = Field(description="shares before the change")
+    new_shares: int = Field(description="shares after the change")
+    effective_date: str = Field(description="effective date")
+    ratio: Optional[float] = Field(
+            default=None, description="ratio of the share change"
+        )
 
 # Define state for application
 class State(TypedDict):
@@ -77,6 +100,7 @@ class State(TypedDict):
     context: List[Document]
     answer: str
     event_type: str
+    corp_action: CorpAction
 
 # Define application steps
 def retrieve(state: State):
@@ -98,8 +122,9 @@ def generate(state: State):
     prompt = hub.pull("rlm/rag-prompt")
     messages = prompt.invoke({"question": state["question"], "context": docs_content})
     response = llm.invoke(messages)
-    return {"answer": response}
-
+    structured_llm = llm.with_structured_output(CorpAction)
+    corp_action = structured_llm.invoke(messages)
+    return { "answer": response.content, "corp_action": corp_action}
 def check_corpaction__type(state:State):
     if state['event_type'] == 'spit':
         return "process_split"
@@ -110,21 +135,34 @@ def process_split(state:State):
     pass
 
 def process_reverse_split(state:State):
-    pass
+    corp_action = state['corp_action']
+    if corp_action.ratio is None:
+        corp_action.ratio = corp_action.new_shares/corp_action.original_shares
 
+    positions = [
+        Position(account='123', security='111, Inc.', shares = 1000, price = 0.05),
+        Position(account='ABC', security='111, Inc.', shares = 500, price = 0.20)
+    ]
+    print("\nPosition before corporate action:\n")
+    print(positions)
+    positions = [Position(account=p.account,security=p.security,shares=p.shares/corp_action.ratio,price=p.price) for p in positions ]
+    print("\nPosition after corporate action:\n")
+    print(positions)
+    print('\n')
 if __name__ == "__main__":
     # https://www.sec.gov/search-filings
     # https://www.sec.gov/ix?doc=/Archives/edgar/data/84246/000008424624000025/tmb-20241107x8k.htm
     urls = ['https://www.sec.gov/Archives/edgar/data/1749864/000101915525000003/ratio424b3.htm']
 
-    # Hardcoded input pdfs
-    save_vector_store(['/src/pdf/YI_ADR_CorpAction.pdf'], 'dtcc')
+    #save_vector_store(['pdf/YI_ADR_CorpAction.pdf'], 'dtcc')
+    # Mac workaround:
+    save_vector_store(['/Users/elizabethharasymiw/Documents/Github/dtcch-2025-abn-clearing-chicago/src/pdf/YI_ADR_CorpAction.pdf'], 'dtcc')
 
     # Compile application and test
     graph_builder = StateGraph(State).add_sequence([retrieve, generate])
     graph_builder.add_edge(START, "retrieve")
     graph_builder.add_node("process_split", process_split)
-    graph_builder.add_node("process_reverse_split", process_split)
+    graph_builder.add_node("process_reverse_split", process_reverse_split)
     graph_builder.add_conditional_edges("generate", check_corpaction__type)
     graph_builder.add_edge('process_split', END)
     graph_builder.add_edge('process_reverse_split', END)
